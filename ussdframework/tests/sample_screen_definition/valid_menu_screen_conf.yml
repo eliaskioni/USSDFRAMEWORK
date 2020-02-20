@@ -1,0 +1,223 @@
+initial_screen:
+  type: initial_screen
+  next_screen: choose_meal
+  pagination_config:
+    ussd_text_limit: 90
+    more_option:
+      en: More
+    back_option:
+      en: Back
+
+
+choose_meal:
+  type: menu_screen
+  text: Choose your favourite meal
+  error_message: |
+    You have selected invalid option try again
+  options:
+      - text: food
+        next_screen: types_of_food
+      - text: fruits
+        next_screen: types_of_fruit
+      - text: drinks
+        next_screen: types_of_drinks
+      - text: vegetables
+        next_screen: types_of_vegetables
+      - text: test pagination
+        next_screen: test_text_prompt_pagination
+
+
+types_of_food:
+  type: menu_screen
+  text: Choose your favourite food
+  options:
+    - text: rice
+      next_screen: rice_chosen
+    - text: back
+      next_screen: choose_meal
+    - text: test next screen routing
+      next_screen:
+        - condition: phone_number == '200'
+          next_screen: test_next_screen_routing_one
+        - condition: phone_number == '201'
+          next_screen: test_next_screen_routing_two
+
+types_of_fruit:
+  type: menu_screen
+  text: No fruits available choose * to go back
+  options:
+    - text: back
+      next_screen: choose_meal
+      input_value: '*'
+
+types_of_drinks:
+  type: menu_screen
+  text: No drinks available choose 0 to go back
+  options:
+    - text: back
+      next_screen: choose_meal
+      input_display: "0 "
+      input_value: '0'
+
+rice_chosen:
+  type: menu_screen
+  text: Your rice will be delivered shortly. Choose 1 to go back
+  options:
+    - text: back
+      next_screen: choose_meal
+
+types_of_vegetables:
+  type: menu_screen
+  text: Choose one of the following vegetables
+  items:
+    text: Vege {{ item }}
+    value: "{{ item }}"
+    with_items: "{{vegetables_list}}"
+    session_key: selected_vegetable
+    next_screen: choose_quantity
+
+choose_quantity:
+  type: menu_screen
+  text: Choose vegetable size
+  items:
+    text: "{{ key }} at Ksh {{ value }}"
+    value:  "{{ key }}"
+    with_dict: "{{ vegetable_quantity }}"
+    session_key: selected_quantity
+    next_screen: selected_vegetable
+  options:
+    - text: back
+      next_screen: choose_meal
+
+selected_vegetable:
+  type: menu_screen
+  text: >
+   You have selected this {{selected_vegetable}}
+   and this quantity {{selected_quantity}} at
+   {{vegetable_quantity[selected_quantity]}}
+  options:
+    - text: test_list
+      next_screen: test_list_with_native_loop
+
+test_list_with_native_loop:
+  type: menu_screen
+  text: ""
+  items:
+    text: "{{item}}"
+    value: "{{item}}"
+    next_screen: test_explicit_dict_loop
+    session_key: alphabet
+    with_items:
+      - a
+      - b
+      - c
+      - d
+
+test_explicit_dict_loop:
+  type: menu_screen
+  text: ""
+  items:
+    text: "{{key}} for {{value}}"
+    value: "{{item}}"
+    next_screen: test_invalid_jija_variable
+    session_key: testing
+    with_dict:
+      a: apple
+      b: boy
+      c: cat
+
+# we only support {{ }} jinja variables the otheres will be ingnored
+# for now
+test_invalid_jija_variable:
+  type: menu_screen
+  text: Choose one of the following vegetables
+  items:
+    text: Vege {{ item }}
+    value: "{{ item }}"
+    with_items: "{%vegetables_list%}"
+    session_key: selected_vegetable
+    next_screen: choose_quantity
+
+
+# The screens below are testing pagination
+test_text_prompt_pagination:
+  type: menu_screen
+  text: |
+    Ussd airflow should be able to wrap anytext that is larger than the one
+    specified into two screens.
+  options:
+    - text: next
+      next_screen: test_pagination_in_menu_options
+
+test_pagination_in_menu_options:
+  type: menu_screen
+  text: |
+    An example of screen with multiple options that need to be paginated
+  options:
+    - text: screen_with_both_text_and_menu_options_pagination
+      next_screen: test_pagination_in_both_text_and_options
+    - text: screen_with_both_text_item_options_pagination
+      next_screen: test_pagination_in_both_text_options_items
+
+test_pagination_in_both_text_and_options:
+  type: menu_screen
+  text: |
+    This screen has both large text and options that exceed the limit required
+    so both the prompt and options will be paginated.
+  options:
+    - text: go back to the previous screen
+      next_screen: test_pagination_in_menu_options
+    - text: quit this session
+      next_screen: last_screen
+    - text: this options will be showed in the next_screen
+      next_screen: test_pagination_in_both_text_options_items
+
+test_pagination_in_both_text_options_items:
+  type: menu_screen
+  text: |
+    This screen has both large text, options, items that exceed ussd text limit
+    part of this text would be displayed in the next screen
+  items:
+    text: "{{item}}"
+    value: "{{item}}"
+    next_screen: last_screen
+    session_key: testing
+    with_items:
+      - apple
+      - boy
+      - cat
+      - dog
+      - egg
+      - frog
+      - girl
+      - house
+      - ice
+      - joyce
+      - kettle
+      - lamp
+      - mum
+      - nurse
+      - ostrich
+      - pigeon
+      - queen
+      - river
+      - sweet
+      - tiger
+      - umbrella
+      - van
+      - water
+  options:
+    - text: quit_session
+      next_screen: last_screen
+
+last_screen:
+  type: quit_screen
+  text: end of session {{testing}}
+
+test_next_screen_routing_one:
+  type: quit_screen
+  text: screen_one
+
+test_next_screen_routing_two:
+  type: quit_screen
+  text: screen_two

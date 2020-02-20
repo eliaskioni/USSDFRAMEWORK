@@ -1,0 +1,42 @@
+# missing next_screen
+enter_height:
+  type: input_screen
+  text:
+    sw: Weka jina lako
+  input_identifier: height
+  # invalid validator, missing text
+  validators:
+    - regex: ^[0-9]{1,7}$
+  ussd_report_session:
+    name: invalid_ussd_report_session
+
+# missing input_indentifier and invalid options
+enter_age:
+    type: input_screen
+    text: Enter your age\n
+    next_screen: thank_you_screen
+    options: True
+    validators:
+        - regex: ^[0-9]{1,7}$
+          text: Only numbers are allowed
+        - expression: ussd_request.input > 100
+          text: Number over 100 is not allowed
+
+# missing next_screen
+show_information:
+    text:
+      en: Your age is {age} and your height is {height}.\n
+          Enter your any thing to go back to the first screen
+      sw: Miaka yako in {age} na ukubwa wako in {height}.
+          Weka kitu ingine yoyote unende kwenye screen ya kwanza
+
+    type: input
+    input_identifier: foo
+
+invalid_next_screen:
+  type: input_screen
+  text: contains invalid next screen format
+  input_identifier: 56
+  next_screen:
+    - condition: 5 > 9
+
